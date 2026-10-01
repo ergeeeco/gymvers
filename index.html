@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Железный круг</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#d9dcdf;--card:#f3f4f5;--ink:#15171a;--mu:#5a6068;--red:#d7263d;--bd:#b9bdc2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Barlow,system-ui,sans-serif}
+.w{max-width:480px;margin:0 auto;padding-bottom:84px}
+h1,h2,.dn{font-family:"Barlow Condensed",Impact,sans-serif;font-weight:800;margin:0;letter-spacing:.2px}
+h1,h2,.dn{font-family:"Barlow Condensed",Impact,sans-serif;font-weight:800;margin:0;letter-spacing:.2px}
+header{position:sticky;top:0;z-index:3;background:var(--ink);color:#f3f4f5;height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;padding-top:env(safe-area-inset-top,0px);box-sizing:content-box}
+header .dn{font-size:26px}
+header .bk{background:none;border:0;color:inherit;font-size:30px;cursor:pointer;padding:0 4px 4px 0}
+.hub{width:22px;height:22px;border-radius:50%;border:5px solid var(--red);background:var(--ink);flex:none}
+.pl{--c:#fff;width:44px;height:44px;border-radius:50%;background:var(--c);border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;position:relative;flex:none;cursor:pointer}
+.pl::before{content:"";position:absolute;inset:5px;border-radius:50%;border:2px solid rgba(0,0,0,.25)}
+.pl b{width:44%;height:44%;border-radius:50%;background:var(--ink);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;z-index:1}
+.pl.lg{width:76px;height:76px}.pl.lg b{font-size:20px}
+.post,.box,.row{background:var(--card);border:2px solid var(--ink);border-radius:6px;margin:10px 10px 0}
+.ph{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.grow{flex:1;min-width:0}
+.nm{font-weight:600;cursor:pointer}
+.mu{color:var(--mu);font-size:13px}
+.lk{background:none;border:0;color:var(--red);font:inherit;font-weight:600;cursor:pointer;padding:0}
+.lk.g{color:var(--mu)}
+.media{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--ink)}
+.tile{aspect-ratio:1;background:var(--ink);color:#f3f4f5;display:flex;flex-direction:column;justify-content:center;padding:18px 22px;border-left:14px solid var(--c,var(--red))}
+.tile .dn{font-size:64px;line-height:1}.tile span{font-size:18px;opacity:.85}
+.strip{display:flex;align-items:baseline;gap:10px;padding:10px 12px 0;flex-wrap:wrap}
+.strip .dn{font-size:40px;line-height:1}
+.chip{font-size:12px;font-weight:600;background:var(--red);color:#fff;border-radius:99px;padding:1px 9px}
+.cap{padding:4px 12px 12px}
+.seg{display:flex;margin:10px}.seg button{flex:1;padding:8px;border:2px solid var(--ink);background:var(--card);font:inherit;font-weight:600;cursor:pointer}
+.seg button:first-child{border-radius:6px 0 0 6px}.seg button:last-child{border-radius:0 6px 6px 0;border-left:0}
+.seg button.on{background:var(--ink);color:#fff}
+.row{display:flex;align-items:center;gap:12px;padding:10px 12px}
+.rk{font:800 30px "Barlow Condensed",sans-serif;width:30px;text-align:center}
+.prof{padding:14px}.prof .top{display:flex;align-items:center;gap:16px}
+.cnt{display:flex;flex:1;justify-content:space-around;text-align:center}.cnt b{display:block;font:800 26px "Barlow Condensed",sans-serif}
+.lifts{display:flex;gap:6px;margin:12px 0}.lifts div{flex:1;text-align:center;border:2px solid var(--ink);border-radius:6px;padding:4px}
+.lifts b{display:block;font:800 26px "Barlow Condensed",sans-serif}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin:10px}
+.grid>div{aspect-ratio:1;overflow:hidden;cursor:pointer;border:2px solid var(--ink)}
+.grid .media,.grid .tile{height:100%;aspect-ratio:auto}.grid .tile{padding:4px 6px;border-left-width:6px}.grid .tile .dn{font-size:24px}.grid .tile span{font-size:11px}
+.box{padding:14px}
+.btn{width:100%;padding:11px;border:2px solid var(--ink);border-radius:6px;background:var(--red);color:#fff;font:800 20px "Barlow Condensed",sans-serif;cursor:pointer;margin-top:12px}
+.btn.alt{background:none;color:var(--ink)}.btn:disabled{opacity:.5}
+input,select{width:100%;padding:9px 10px;border:2px solid var(--ink);border-radius:6px;background:#fff;color:var(--ink);font:inherit}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 3px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.msg{margin:10px;padding:9px 12px;border-radius:6px;background:#fff;border:2px solid var(--red);font-size:14px}.msg.ok{border-color:#2e9e5b}
+.empty{text-align:center;color:var(--mu);padding:40px 20px}
+.auth{padding:28px 14px}.auth h1{font-size:54px;line-height:.95;margin-bottom:6px}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--ink);z-index:4;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav div{max-width:480px;margin:0 auto;display:flex}
+nav button{flex:1;background:none;border:0;border-top:4px solid transparent;color:#9aa0a8;padding:10px 0 8px;cursor:pointer}
+nav button.on{color:#fff;border-top-color:var(--red)}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="w"><header id="hd"></header><div id="app"></div></div>
+<nav id="navw" hidden><div id="nav"></div></nav>
+<script>
+// ===== НАСТРОЙКА: вставьте данные из Supabase (Project Settings → API) =====
+const CFG={url:'https://ztboewtsaijjwjqaicrm.supabase.co/rest/v1/',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0Ym9ld3RzYWlqandqcWFpY3JtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4NjMxNzQsImV4cCI6MjEwNjQzOTE3NH0.XJHU3fC8nVE_-s8sEwsOjh-mZqB1_nMJhW08LSVbW8A'};
+// ==========================================================================
+const sb=window.supabase&&CFG.url.startsWith('http')?supabase.createClient(CFG.url,CFG.key):null;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{v=parseFloat(String(v).replace(',','.'));return isFinite(v)&&v>0?v:0};
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n).toLocaleString('ru-RU');
+let me=null,PF={},FO=[],PO=[],tab='feed',scope='all',open=null,pv=null,mode='in',err='',info='';
+const IC={feed:'<path d="M3 11l9-8 9 8v10h-6v-6H9v6H3z"/>',rank:'<path d="M5 21V10M12 21V3M19 21v-7"/>',new:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'};
+const TIERS=[[400,'Элита','#d7263d'],[325,'Мастер','#1f5fbf'],[250,'Опытный','#f2b705'],[150,'Любитель','#2e9e5b'],[0,'Новичок','#ffffff']];
+const tierOf=d=>TIERS.find(t=>d>=t[0])||TIERS[4];
+function dots(bw,t,sex){
+  if(!bw||!t)return 0;
+  const c=sex==='f'?[-57.96288,13.6175032,-0.1126655495,0.0005158568,-0.0000010706]:[-307.75076,24.0900756,-0.1918759221,0.0007391293,-0.000001093];
+  const b=Math.min(Math.max(bw,40),sex==='f'?150:210);
+  return 500*t/(c[0]+c[1]*b+c[2]*b**2+c[3]*b**3+c[4]*b**4);
+}
+function stat(p){const sq=num(p.sq),bp=num(p.bp),dl=num(p.dl),total=sq&&bp&&dl?sq+bp+dl:0;return {sq,bp,dl,total,d:dots(num(p.bw),total,p.sex)}}
+const nameOf=p=>(p&&p.username)||'атлет';
+const followers=u=>FO.filter(f=>f.following===u).length;
+const isF=u=>FO.some(f=>f.follower===me&&f.following===u);
+const fmtDate=t=>new Date(t).toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
+const mUrl=p=>sb.storage.from('media').getPublicUrl(p).data.publicUrl;
+function plate(u,lg){const p=PF[u]||{},s=stat(p),c=s.total?tierOf(s.d)[2]:'#ffffff';return `<div class="pl ${lg?'lg':''}" style="--c:${c}" data-a="open" data-u="${esc(u)}" title="${s.total?tierOf(s.d)[1]:'Без рейтинга'}"><b>${esc(nameOf(p).charAt(0).toUpperCase())}</b></div>`}
+const fbtn=u=>!me||u===me?'':`<button class="lk ${isF(u)?'g':''}" data-a="fol" data-u="${esc(u)}">${isF(u)?'Вы подписаны':'Подписаться'}</button>`;
+const detail=w=>[w.reps&&'× '+w.reps,w.sets&&'× '+w.sets+' подх.',w.kg&&w.reps&&w.sets&&'объём '+fmt(w.kg*w.reps*w.sets)+' кг'].filter(Boolean).join(' ');
+function isPR(w){
+  if(!w.kg)return false;
+  const prev=PO.filter(o=>o.user_id===w.user_id&&o.ex.toLowerCase()===w.ex.toLowerCase()&&o.created_at<w.created_at);
+  return prev.length>0&&!prev.some(o=>o.kg>=w.kg);
+}
+function media(w){
+  if(w.media_path)return w.media_type==='v'?`<video class="media" src="${esc(mUrl(w.media_path))}" controls playsinline preload="metadata"></video>`:`<img class="media" src="${esc(mUrl(w.media_path))}" alt="" loading="lazy">`;
+  const s=stat(PF[w.user_id]||{});
+  return `<div class="tile" style="--c:${s.total?tierOf(s.d)[2]:'#d7263d'}"><div class="dn">${w.kg?fmt(w.kg)+' кг':esc(w.ex)}</div><span>${w.kg?esc(w.ex):''} ${esc(detail(w))}</span></div>`;
+}
+function post(w){
+  const u=w.user_id,n=nameOf(PF[u]);
+  return `<div class="post"><div class="ph">${plate(u)}<div class="grow"><div class="nm" data-a="open" data-u="${esc(u)}">${esc(n)}</div><div class="mu">${fmtDate(w.created_at)}</div></div>${fbtn(u)}${u===me?`<button class="lk g" data-a="delw" data-i="${w.id}">Удалить</button>`:''}</div>
+  ${media(w)}<div class="strip">${w.kg?`<span class="dn">${fmt(w.kg)} кг</span>`:''}<span class="mu">${esc(detail(w))}</span>${isPR(w)?'<span class="chip">Личный рекорд</span>':''}</div>
+  <div class="cap"><b>${esc(w.ex)}</b>${w.note?' · '+esc(w.note):''}</div></div>`;
+}
+
+function vAuth(){
+  const up=mode==='up';
+  return `<div class="auth"><h1>Железный<br>круг</h1><p class="mu">Сообщество русскоговорящих атлетов: публикуйте тренировки, вносите свои цифры в троеборье, растите в рейтинге.</p>
+  <div class="seg" style="margin:16px 0 0"><button class="${up?'':'on'}" data-a="mode" data-v="in">Вход</button><button class="${up?'on':''}" data-a="mode" data-v="up">Регистрация</button></div>
+  ${up?'<label>Ник</label><input id="au" maxlength="24" autocomplete="username">':''}
+  <label>Email</label><input id="ae" type="email" autocomplete="email">
+  <label>Пароль (от 6 символов)</label><input id="ap" type="password" autocomplete="${up?'new-password':'current-password'}">
+  <button class="btn" data-a="auth">${up?'Создать аккаунт':'Войти'}</button></div>`;
+}
+function vFeed(){
+  const items=PO.filter(w=>scope==='all'||w.user_id===me||isF(w.user_id));
+  return `<div class="seg"><button class="${scope==='all'?'on':''}" data-a="scope" data-v="all">Все</button><button class="${scope==='sub'?'on':''}" data-a="scope" data-v="sub">Подписки</button></div>`+
+  (items.length?items.slice(0,50).map(post).join(''):`<div class="empty">${scope==='sub'?'Подпишитесь на атлетов в рейтинге, и их тренировки появятся здесь.':'Лента пуста. Нажмите «+» и опубликуйте первую тренировку.'}</div>`);
+}
+function vRank(){
+  const rows=Object.values(PF).map(p=>({p,s:stat(p)})).filter(r=>r.s.total).sort((a,b)=>b.s.d-a.s.d);
+  const h=`<div class="msg" style="border-color:var(--ink)">Рейтинг считается по очкам DOTS: сумма трёх движений с поправкой на вес тела и пол. Цвет блина показывает уровень: белый — новичок, зелёный — любитель, жёлтый — опытный, синий — мастер, красный — элита.</div>`;
+  if(!rows.length)return h+`<div class="empty">Рейтинг пуст. Внесите присед, жим и тягу в профиле.</div>`;
+  return h+rows.map((r,i)=>`<div class="row"><div class="rk">${i+1}</div>${plate(r.p.id)}<div class="grow"><div class="nm" data-a="open" data-u="${esc(r.p.id)}">${esc(nameOf(r.p))}</div><div class="mu">${tierOf(r.s.d)[1]} · сумма ${fmt(r.s.total)} кг · ${followers(r.p.id)} подписч.</div></div><div style="text-align:right"><span class="dn" style="font-size:26px">${r.s.d.toFixed(1)}</span><div class="mu">DOTS</div></div></div>`).join('');
+}
+function vUser(u){
+  const p=PF[u]||{},s=stat(p),ws=PO.filter(w=>w.user_id===u);
+  let h=`<div class="box prof" style="margin-bottom:0"><div class="top">${plate(u,1)}<div class="cnt"><div><b>${ws.length}</b><span class="mu">постов</span></div><div><b>${followers(u)}</b><span class="mu">подписчики</span></div><div><b>${FO.filter(f=>f.follower===u).length}</b><span class="mu">подписки</span></div></div></div>
+  <h2 style="font-size:28px;margin-top:10px">${esc(nameOf(p))}</h2><div class="mu">${s.total?tierOf(s.d)[1]+' · '+s.d.toFixed(1)+' DOTS · сумма '+fmt(s.total)+' кг':'Пока без рейтинга'}</div>
+  <div class="lifts"><div><span class="mu">Присед</span><b>${s.sq||'—'}</b></div><div><span class="mu">Жим</span><b>${s.bp||'—'}</b></div><div><span class="mu">Тяга</span><b>${s.dl||'—'}</b></div></div>${fbtn(u)}</div>`;
+  if(u===me)h+=`<div class="box"><h2 style="font-size:22px">Мои результаты</h2>
+  <label>Ник</label><input id="pn" maxlength="24" value="${esc(p.username||'')}">
+  <div class="g2"><div><label>Пол</label><select id="ps"><option value="m" ${p.sex!=='f'?'selected':''}>Мужчина</option><option value="f" ${p.sex==='f'?'selected':''}>Женщина</option></select></div><div><label>Вес тела, кг</label><input id="pb" inputmode="decimal" value="${esc(p.bw||'')}"></div></div>
+  <div class="g3"><div><label>Присед, кг</label><input id="p1" inputmode="decimal" value="${esc(p.sq||'')}"></div><div><label>Жим, кг</label><input id="p2" inputmode="decimal" value="${esc(p.bp||'')}"></div><div><label>Тяга, кг</label><input id="p3" inputmode="decimal" value="${esc(p.dl||'')}"></div></div>
+  <button class="btn" data-a="savep">Сохранить результаты</button><button class="btn alt" data-a="out">Выйти из аккаунта</button></div>`;
+  return h+(ws.length?`<div class="grid">${ws.map(w=>`<div data-a="post" data-i="${w.id}">${media(w)}</div>`).join('')}</div>`:`<div class="empty">Публикаций пока нет</div>`);
+}
+function vNew(){
+  return `<div class="box"><h2 style="font-size:24px">Новая тренировка</h2>
+  <label>Фото или видео (видео до 20 МБ)</label><input id="wf" type="file" accept="image/*,video/*">
+  <label>Упражнение</label><input id="wx" list="ex" maxlength="40" placeholder="Например, Присед"><datalist id="ex"><option>Присед</option><option>Жим лёжа</option><option>Становая тяга</option><option>Жим стоя</option><option>Подтягивания</option><option>Тяга в наклоне</option><option>Жим ногами</option></datalist>
+  <div class="g3"><div><label>Вес, кг</label><input id="wk" inputmode="decimal"></div><div><label>Повторы</label><input id="wr" inputmode="numeric"></div><div><label>Подходы</label><input id="wsets" inputmode="numeric"></div></div>
+  <label>Подпись</label><input id="wn" maxlength="120" placeholder="Как прошло?">
+  <button class="btn" data-a="addw">Опубликовать</button></div>`;
+}
+
+function render(force){
+  if(!force&&(tab==='new'||/INPUT|SELECT|TEXTAREA/.test(document.activeElement&&document.activeElement.tagName)))return;
+  const back=pv||open;
+  $('hd').innerHTML=(me&&back?`<button class="bk" data-a="back" aria-label="Назад">‹</button>`:'')+`<span class="hub"></span><span class="dn">Железный круг</span>`;
+  $('navw').hidden=!me;
+  $('nav').innerHTML=['feed','rank','new','me'].map(t=>`<button class="${tab===t&&!back?'on':''}" data-a="tab" data-v="${t}" aria-label="${t}"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${IC[t]}</svg></button>`).join('');
+  let h=(err?`<div class="msg">${esc(err)}</div>`:'')+(info?`<div class="msg ok">${esc(info)}</div>`:'');
+  if(!sb)h+=`<div class="box"><h2>Нужна настройка</h2><p>Откройте index.html и вставьте адрес проекта и ключ Supabase в блок CFG. Подробности в README.md.</p></div>`;
+  else if(!me)h+=vAuth();
+  else if(pv){const w=PO.find(x=>x.id===pv);h+=w?post(w):'<div class="empty">Публикация удалена</div>'}
+  else if(open)h+=vUser(open);
+  else h+=tab==='feed'?vFeed():tab==='rank'?vRank():tab==='new'?vNew():vUser(me);
+  $('app').innerHTML=h;
+}
+
+async function loadAll(){
+  const [a,b,c]=await Promise.all([sb.from('profiles').select('*'),sb.from('follows').select('*'),sb.from('posts').select('*').order('created_at',{ascending:false}).limit(300)]);
+  if(a.error||b.error||c.error)err='Не удалось загрузить данные. Проверьте подключение.';
+  else{PF=Object.fromEntries(a.data.map(p=>[p.id,p]));FO=b.data;PO=c.data;err=''}
+  render();
+}
+async function doAuth(){
+  const email=$('ae').value.trim(),password=$('ap').value;
+  if(!email||password.length<6){err='Введите email и пароль от 6 символов.';info='';render(true);return}
+  let r;
+  if(mode==='up'){
+    const un=$('au').value.trim();
+    if(!un){err='Придумайте ник.';render(true);return}
+    r=await sb.auth.signUp({email,password,options:{data:{username:un}}});
+    if(!r.error&&!r.data.session){err='';info='Мы отправили письмо. Подтвердите email и войдите.';mode='in';render(true);return}
+  }else r=await sb.auth.signInWithPassword({email,password});
+  if(r.error){err='Не получилось: '+r.error.message;info='';render(true)}
+}
+async function prep(f){
+  if(f.type.startsWith('video/')){if(f.size>20*1048576)throw new Error('видео больше 20 МБ');return f}
+  const bm=await createImageBitmap(f),k=Math.min(1,1080/Math.max(bm.width,bm.height)),c=document.createElement('canvas');
+  c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+  return new Promise(r=>c.toBlob(r,'image/jpeg',.85));
+}
+async function addPost(b){
+  const ex=$('wx').value.trim();
+  if(!ex){err='Укажите упражнение.';render(true);return}
+  const row={user_id:me,ex,kg:num($('wk').value),reps:Math.round(num($('wr').value)),sets:Math.round(num($('wsets').value)),note:$('wn').value.trim()};
+  const f=$('wf').files[0];
+  b.disabled=true;b.textContent='Публикуем…';
+  try{
+    if(f){
+      const v=f.type.startsWith('video/'),path=`${me}/${Date.now()}.${v?(f.name.split('.').pop()||'mp4'):'jpg'}`;
+      const up=await sb.storage.from('media').upload(path,await prep(f),{contentType:v?f.type:'image/jpeg'});
+      if(up.error)throw up.error;
+      row.media_path=path;row.media_type=v?'v':'i';
+    }
+    const r=await sb.from('posts').insert(row);if(r.error)throw r.error;
+    err='';tab='feed';scope='all';await loadAll();render(true);
+  }catch(e){err='Не удалось опубликовать: '+(e.message||e);render(true)}
+}
+async function delPost(id){
+  const w=PO.find(x=>x.id===id);if(!w)return;
+  PO=PO.filter(x=>x.id!==id);pv=null;render(true);
+  await sb.from('posts').delete().eq('id',id);
+  if(w.media_path)await sb.storage.from('media').remove([w.media_path]);
+}
+async function fol(u){
+  if(isF(u)){FO=FO.filter(f=>!(f.follower===me&&f.following===u));render(true);await sb.from('follows').delete().match({follower:me,following:u})}
+  else{FO.push({follower:me,following:u});render(true);await sb.from('follows').insert({follower:me,following:u})}
+}
+async function saveP(){
+  const patch={username:$('pn').value.trim()||nameOf(PF[me]),sex:$('ps').value,bw:num($('pb').value)||null,sq:num($('p1').value)||null,bp:num($('p2').value)||null,dl:num($('p3').value)||null};
+  const r=await sb.from('profiles').update(patch).eq('id',me);
+  if(r.error)err='Не удалось сохранить: '+r.error.message;else{PF[me]={...PF[me],...patch};err='';info='Сохранено.'}
+  render(true);
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;
+  const a=b.dataset.a,u=b.dataset.u;
+  info='';
+  if(a==='mode'){mode=b.dataset.v;err=''}
+  else if(a==='auth'){doAuth();return}
+  else if(a==='out'){sb.auth.signOut();return}
+  else if(a==='tab'){tab=b.dataset.v;open=null;pv=null;err=''}
+  else if(a==='scope')scope=b.dataset.v;
+  else if(a==='open'){if(u===me){tab='me';open=null}else open=u;pv=null}
+  else if(a==='post')pv=+b.dataset.i;
+  else if(a==='back'){if(pv)pv=null;else open=null}
+  else if(a==='fol'){fol(u);return}
+  else if(a==='savep'){saveP();return}
+  else if(a==='addw'){addPost(b);return}
+  else if(a==='delw'){delPost(+b.dataset.i);return}
+  render(true);window.scrollTo(0,0);
+});
+if(sb){
+  sb.auth.onAuthStateChange((_e,s)=>{
+    me=s?s.user.id:null;
+    if(me){loadAll().then(()=>render(true))}else{PF={};FO=[];PO=[];render(true)}
+  });
+}else render(true);
+</script>
+</body>
+</html>

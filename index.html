@@ -76,7 +76,7 @@ nav button.on{color:var(--tx);border-top-color:var(--red)}
 <nav id="navw" hidden><div id="nav"></div></nav>
 <script>
 // ===== НАСТРОЙКА: вставьте данные из Supabase (Project Settings → API) =====
-const CFG={url:'https://uaujxggcjnjmzpselpsi.supabase.co/rest/v1/',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhdWp4Z2djam5qbXpwc2VscHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5MDY5MDMsImV4cCI6MjEwNjQ4MjkwM30.iWhAPuYZO16YI9J2XEgd2V-OgUCD4Ap-Ev1JYIUoiBY'};
+const CFG={url:'https://uaujxggcjnjmzpselpsi.supabase.co' ,key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhdWp4Z2djam5qbXpwc2VscHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5MDY5MDMsImV4cCI6MjEwNjQ4MjkwM30.iWhAPuYZO16YI9J2XEgd2V-OgUCD4Ap-Ev1JYIUoiBY'};
 // ==========================================================================
 const sb=window.supabase&&CFG.url.startsWith('http')?supabase.createClient(CFG.url,CFG.key):null;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
